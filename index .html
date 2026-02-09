@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Santuario de la Mascara</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0a0a0a; color: white; line-height: 1.6; }
+        header { background: #1a1a1a; padding: 15px 20px; border-bottom: 3px solid #D4AF37; position: fixed; width: 100%; top: 0; z-index: 1000; }
+        .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; color: #D4AF37; font-weight: bold; text-decoration: none; }
+        .logo span { display: block; font-size: 0.75rem; color: white; letter-spacing: 2px; }
+        .btn { padding: 10px 20px; border-radius: 25px; border: none; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+        .btn-gold { background: #D4AF37; color: #0a0a0a; }
+        .btn-outline { background: transparent; border: 2px solid #D4AF37; color: #D4AF37; }
+        main { margin-top: 80px; padding: 20px; max-width: 1400px; margin-left: auto; margin-right: auto; }
+        .hero { text-align: center; padding: 60px 20px; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1544531585-9847b68c8c86?w=1200') center/cover; border-radius: 20px; margin-bottom: 30px; }
+        .hero h1 { font-size: 2.5rem; color: #D4AF37; margin-bottom: 15px; }
+        .hero p { font-size: 1.1rem; opacity: 0.9; max-width: 600px; margin: 0 auto 20px; }
+        .commission-badge { background: rgba(0,0,0,0.8); display: inline-block; padding: 15px 30px; border-radius: 50px; border: 2px solid #D4AF37; font-size: 1rem; }
+        .commission-badge strong { color: #D4AF37; }
+        .filters { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .filters select, .filters input { padding: 12px 20px; border-radius: 10px; border: 1px solid #D4AF37; background: #1a1a1a; color: white; font-size: 1rem; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .product-card { background: #1a1a1a; border-radius: 20px; overflow: hidden; border: 1px solid #333; transition: transform 0.3s; }
+        .product-card:hover { transform: translateY(-5px); border-color: #D4AF37; }
+        .product-card.admin { border: 2px solid #D4AF37; }
+        .admin-badge { position: absolute; background: #D4AF37; color: #0a0a0a; padding: 5px 15px; border-radius: 0 0 0 15px; font-size: 0.75rem; font-weight: bold; }
+        .product-image { height: 250px; background: #2a2a2a; position: relative; overflow: hidden; }
+        .product-image img { width: 100%; height: 100%; object-fit: cover; }
+        .category-tag { position: absolute; top: 15px; left: 15px; background: #8B0000; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+        .product-info { padding: 20px; }
+        .seller-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 0.9rem; color: #aaa; }
+        .seller-avatar { width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #D4AF37, #8B0000); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 0.9rem; }
+        .product-title { font-size: 1.2rem; margin-bottom: 8px; color: #D4AF37; font-weight: 600; }
+        .product-condition { display: inline-block; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin-bottom: 15px; }
+        .product-terms { font-size: 0.85rem; color: #888; margin-bottom: 15px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #333; }
+        .price { font-size: 1.4rem; font-weight: bold; }
+        .price span { font-size: 0.9rem; color: #888; display: block; font-weight: normal; }
+        .contact-btn { background: #D4AF37; color: #0a0a0a; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .fab { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: #27ae60; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; cursor: pointer; border: none; z-index: 100; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .modal.active { display: flex; }
+        .modal-content { background: #1a1a1a; border-radius: 20px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; border: 2px solid #D4AF37; }
+        .modal-header { background: #0a0a0a; padding: 25px; border-bottom: 2px solid #D4AF37; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        .modal-header h2 { color: #D4AF37; font-size: 1.5rem; }
+        .close-btn { background: none; border: none; color: white; font-size: 2rem; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+        .modal-body { padding: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #555; background: #0a0a0a; color: white; font-size: 1rem; }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .currency-input { display: flex; gap: 10px; }
+        .currency-input select { width: 100px; flex-shrink: 0; }
+        .image-upload { border: 2px dashed #D4AF37; border-radius: 15px; padding: 40px; text-align: center; cursor: pointer; background: rgba(212, 175, 55, 0.05); }
+        .preview-images { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .preview-images img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 2px solid #D4AF37; }
+        .commission-calc { background: rgba(39, 174, 96, 0.15); border: 2px solid #27ae60; border-radius: 15px; padding: 25px; margin: 25px 0; }
+        .commission-calc h4 { color: #27ae60; margin-bottom: 15px; }
+        .calc-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .calc-row:last-child { border-bottom: none; font-size: 1.2rem; font-weight: bold; color: #27ae60; margin-top: 10px; padding-top: 15px; border-top: 2px solid #27ae60; }
+        .bbva-box { background: linear-gradient(135deg, #004481, #003366); color: white; padding: 25px; border-radius: 15px; margin: 25px 0; text-align: center; border: 2px solid #D4AF37; }
+        .bbva-box strong { color: #D4AF37; font-size: 1.1rem; display: block; margin-bottom: 10px; }
+        .account-number { font-family: monospace; font-size: 1.4rem; letter-spacing: 3px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin: 15px 0; }
+        .submit-btn { width: 100%; background: linear-gradient(135deg, #D4AF37, #F4D03F); color: #0a0a0a; border: none; padding: 20px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .admin-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #0a0a0a; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #D4AF37; }
+        .stat-card h3 { color: #D4AF37; font-size: 2rem; margin-bottom: 5px; }
+        .stat-card p { color: #888; font-size: 0.9rem; }
+        .contact-info { text-align: center; }
+        .contact-info img { width: 200px; height: 200px; border-radius: 20px; object-fit: cover; border: 3px solid #D4AF37; margin-bottom: 25px; }
+        .contact-details { background: #0a0a0a; padding: 25px; border-radius: 15px; margin: 25px 0; text-align: left; }
+        .contact-details p { margin-bottom: 15px; font-size: 1.05rem; }
+        .contact-details strong { color: #D4AF37; }
+        .terms-box { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin: 20px 0; border-left: 4px solid #D4AF37; }
+        .terms-box h4 { color: #D4AF37; margin-bottom: 10px; }
+        .whatsapp-btn { display: inline-flex; align-items: center; gap: 10px; background: #25D366; color: white; padding: 18px 40px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.2rem; margin-top: 20px; }
+        .warning-box { background: rgba(139, 0, 0, 0.2); border-left: 4px solid #8B0000; padding: 20px; border-radius: 0 15px 15px 0; margin: 20px 0; text-align: left; }
+        .warning-box h4 { color: #ff6b6b; margin-bottom: 10px; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #27ae60; color: white; padding: 18px 35px; border-radius: 50px; font-weight: bold; opacity: 0; transition: all 0.3s; z-index: 3000; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        @media (max-width: 768px) { .hero h1 { font-size: 1.8rem; } .products-grid { grid-template-columns: 1fr; } .filters select, .filters input { width: 100%; } .admin-stats { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo" onclick="location.reload()">
+                ⛩️ EL SANTUARIO
+                <span>DE LA MASCARA</span>
+            </a>
+            <div>
+                <button class="btn btn-outline" onclick="openModal('adminModal')">Panel Admin</button>
+                <button class="btn btn-gold" onclick="openModal('sellModal')">+ Vender</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>El Santuario de la Mascara</h1>
+            <p>El marketplace sagrado de la lucha libre. Publica tu mascara, fija tu precio, negocia directo.</p>
+            <div class="commission-badge">
+                <strong>3.8%</strong> comision automatica a BBVA • Tu recibes el <strong>96.2%</strong>
+            </div>
+        </section>
+
+        <div class="filters">
+            <select id="filterType" onchange="renderProducts()">
+                <option value="all">Todos los vendedores</option>
+                <option value="admin">⛩️ El Santuario</option>
+                <option value="user">Comunidad</option>
+            </select>
+            <select id="filterCategory" onchange="renderProducts()">
+                <option value="all">Todas las categorias</option>
+                <option value="leyenda">Leyenda</option>
+                <option value="semipro">Semi-Pro</option>
+                <option value="independiente">Independiente</option>
+                <option value="original">Diseno Original</option>
+                <option value="vintage">Vintage</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="Buscar mascara..." oninput="renderProducts()">
+        </div>
+
+        <div class="products-grid" id="productsGrid"></div>
+    </main>
+
+    <button class="fab" onclick="openModal('sellModal')">+</button>
+
+    <div class="modal" id="sellModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📤 Vender tu Mascara</h2>
+                <button class="close-btn" onclick="closeModal('sellModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="sellForm" onsubmit="handleSubmit(event)">
+                    <div class="form-group">
+                        <label>Nombre de la mascara *</label>
+                        <input type="text" id="maskName" required placeholder="Ej: Mascara original Blue Demon Jr. autografiada">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Categoria *</label>
+                            <select id="maskCategory" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="leyenda">Leyenda</option>
+                                <option value="semipro">Semi-Pro</option>
+                                <option value="independiente">Independiente</option>
+                                <option value="original">Diseno Original</option>
+                                <option value="vintage">Vintage</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Condicion *</label>
+                            <select id="maskCondition" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Nueva">Nueva</option>
+                                <option value="Usada en combate">Usada en combate</option>
+                                <option value="Autografiada">Autografiada</option>
+                                <option value="Vintage">Vintage</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Fotos de tu mascara * (max. 5)</label>
+                        <div class="image-upload" onclick="document.getElementById('maskImages').click()">
+                            <div style="font-size: 3rem; margin-bottom: 10px;">📷</div>
+                            <div>Haz clic para subir fotos</div>
+                            <small style="color: #888;">Primera imagen sera la portada</small>
+                        </div>
+                        <input type="file" id="maskImages" multiple accept="image/*" style="display: none;" onchange="previewImages(this)">
+                        <div class="preview-images" id="previewContainer"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tu precio *</label>
+                        <div class="currency-input">
+                            <select id="maskCurrency" onchange="calculate()">
+                                <option value="MXN">MXN</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                            </select>
+                            <input type="number" id="maskPrice" placeholder="0.00" min="1" step="0.01" required oninput="calculate()">
+                        </div>
+                    </div>
+
+                    <div class="commission-calc">
+                        <h4>💰 Desglose de pagos automaticos</h4>
+                        <div class="calc-row">
+                            <span>Precio de venta:</span>
+                            <span id="calcPrice">$0.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>Comision Santuario (3.8%):</span>
+                            <span style="color: #D4AF37;">→ BBVA</span>
+                        </div>
+                        <div class="calc-row">
+                            <span style="color: #D4AF37;" id="calcCommission">$0.00</span>
+                            <span style="color: #666; font-size: 0.85rem;">Automatico</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>TU RECIBES (96.2%):</span>
+                            <span id="calcTotal">$0.00</span>
+                        </div>
+                        <small style="color: #888; display: block; margin-top: 10px;">
+                            Al venderse: el comprador paga el precio total, el sistema divide automaticamente
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tus terminos de entrega *</label>
+                        <textarea id="maskTerms" required placeholder="Ej: Envio por FedEx (costo comprador), entrega 3-5 dias. O: Recogida personal en CDMX, pago contra entrega."></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Tu nombre *</label>
+                            <input type="text" id="sellerName" required placeholder="Nombre o tienda">
+                        </div>
+                        <div class="form-group">
+                            <label>WhatsApp *</label>
+                            <input type="tel" id="sellerWhatsApp" required placeholder="+52 55 1234 5678">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ubicacion *</label>
+                        <input type="text" id="sellerLocation" required placeholder="Ciudad, Estado, Pais">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cuenta para recibir tu pago (96.2%) *</label>
+                        <input type="text" id="sellerBank" required placeholder="CLABE, numero de cuenta, PayPal, Mercado Pago, etc.">
+                    </div>
+
+                    <div class="bbva-box">
+                        <strong>🏦 Deposito Automatico de Comision</strong>
+                        <div class="account-number">012 180 01593646508 1</div>
+                        <div>BBVA - El Santuario de la Mascara</div>
+                        <small style="opacity: 0.8;">El 3.8% se transfiere automaticamente aqui</small>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Publicar mi mascara</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚡ Panel del Guardian</h2>
+                <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: rgba(39, 174, 96, 0.1); border: 2px solid #27ae60; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+                    <h3 style="color: #27ae60; margin-bottom: 15px;">🏦 Transferencias Automaticas BBVA</h3>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <span>Cuenta:</span>
+                        <span style="font-family: monospace; color: #D4AF37;">012 180 01593646508 1</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <span>Banco:</span>
+                        <span>BBVA Mexico</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                        <span>Comision:</span>
+                        <span style="color: #D4AF37;">3.8% automatico</span>
+                    </div>
+                </div>
+
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <h3 id="statTotal">$0</h3>
+                        <p>Total vendido</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="statComm">$0</h3>
+                        <p>Tu comision 3.8%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="statAuto">$0</h3>
+                        <p>Depositado auto</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="statMasks">0</h3>
+                        <p>Mascaras activas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📞 Contactar Vendedor</h2>
+                <button class="close-btn" onclick="closeModal('contactModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="contact-info" id="contactContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let products = [
+            {
+                id: 1,
+                name: "Mascara Blue Demon Jr. - 50 Aniversario Autografiada",
+                category: "leyenda",
+                condition: "Autografiada",
+                price: 2500,
+                currency: "USD",
+                images: ["https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=600"],
+                terms: "Envio DHL express incluido a todo Mexico y USA. Entrega 3-5 dias habiles. Seguro incluido.",
+                whatsapp: "+525512345678",
+                seller: "El Santuario de la Mascara",
+                sellerType: "admin",
+                location: "CDMX, Mexico",
+                sellerBank: "BBVA 012180015936465081"
+            },
+            {
+                id: 2,
+                name: "Mascara Semi-Pro 'El Rayo' - Usada en Arena Jalisco",
+                category: "semipro",
+                condition: "Usada en combate",
+                price: 8500,
+                currency: "MXN",
+                images: ["https://images.unsplash.com/photo-1535581652167-3d6b98c36cdb?w=600"],
+                terms: "Recogida personal en Guadalajara centro o envio por FedEx (costo a cargo del comprador).",
+                whatsapp: "+523312345678",
+                seller: "LuchaLibreJalisco",
+                sellerType: "user",
+                location: "Guadalajara, Jalisco",
+                sellerBank: "CLABE 014320123456789012"
+            },
+            {
+                id: 3,
+                name: "Diseno Original Artesanal - Estilo Dragon Prehispanico",
+                category: "original",
+                condition: "Nueva",
+                price: 3200,
+                currency: "MXN",
+                images: ["https://images.unsplash.com/photo-1561839561-b13bcfe95249?w=600"],
+                terms: "Envio por Correos de Mexico $150. Tiempo estimado 7-10 dias. Pago adelantado.",
+                whatsapp: "+529512345678",
+                seller: "ArtesaniasOaxaca",
+                sellerType: "user",
+                location: "Oaxaca, Mexico",
+                sellerBank: "Mercado Pago: artesanias@email.com"
+            }
+        ];
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const filterType = document.getElementById('filterType').value;
+            const filterCategory = document.getElementById('filterCategory').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = products.filter(p => {
+                if (filterType !== 'all' && p.sellerType !== filterType) return false;
+                if (filterCategory !== 'all' && p.category !== filterCategory) return false;
+                if (search && !p.name.toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            grid.innerHTML = filtered.map(p => `
+                <div class="product-card ${p.sellerType === 'admin' ? 'admin' : ''}" style="position: relative;">
+                    ${p.sellerType === 'admin' ? '<div class="admin-badge">⛩️ SANTUARIO</div>' : ''}
+                    <div class="product-image">
+                        <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
+                        <span class="category-tag">${p.category}</span>
+                    </div>
+                    <div class="product-info">
+                        <div class="seller-info">
+                            <div class="seller-avatar">${p.seller[0]}</div>
+                            <span>${p.seller} • ${p.location}</span>
+                        </div>
+                        <h3 class="product-title">${p.name}</h3>
+                        <span class="product-condition">${p.condition}</span>
+                        <p class="product-terms">${p.terms}</p>
+                        <div class="product-footer">
+                            <div class="price">
+                                ${p.currency} $${p.price.toLocaleString()}
+                                <span>+ envio segun terminos</span>
+                            </div>
+                            <button class="contact-btn" onclick="showContact(${p.id})">
+                                ${p.sellerType === 'admin' ? 'Editar' : 'Contactar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            updateStats();
+        }
+
+        function previewImages(input) {
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            
+            if (input.files) {
+                Array.from(input.files).slice(0, 5).forEach((file, i) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const div = document.createElement('div');
+                        div.style.cssText = 'position: relative;';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px; border: 2px solid #D4AF37;">
+                            ${i === 0 ? '<div style="position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); background: #D4AF37; color: #0a0a0a; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: bold;">PORTADA</div>' : ''}
+                        `;
+                        container.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function calculate() {
+            const price = parseFloat(document.getElementById('maskPrice').value) || 0;
+            const currency = document.getElementById('maskCurrency').value;
+            
+            const commission = price * 0.038;
+            const sellerGets = price - commission;
+
+            document.getElementById('calcPrice').textContent = `${currency} $${price.toFixed(2)}`;
+            document.getElementById('calcCommission').textContent = `${currency} $${commission.toFixed(2)}`;
+            document.getElementById('calcTotal').textContent = `${currency} $${sellerGets.toFixed(2)}`;
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            
+            const price = parseFloat(document.getElementById('maskPrice').value);
+            const currency = document.getElementById('maskCurrency').value;
+            
+            const newProduct = {
+                id: products.length + 1,
+                name: document.getElementById('maskName').value,
+                category: document.getElementById('maskCategory').value,
+                condition: document.getElementById('maskCondition').value,
+                price: price,
+                currency: currency,
+                images: ["https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=600"],
+                terms: document.getElementById('maskTerms').value,
+                whatsapp: document.getElementById('sellerWhatsApp').value,
+                seller: document.getElementById('sellerName').value,
+                sellerType: "user",
+                location: document.getElementById('sellerLocation').value,
+                sellerBank: document.getElementById('sellerBank').value
+            };
+
+            products.unshift(newProduct);
+            renderProducts();
+            
+            closeModal('sellModal');
+            showToast('Mascara publicada. Al venderse: 3.8% → BBVA automatico');
+            
+            e.target.reset();
+            document.getElementById('previewContainer').innerHTML = '';
+            calculate();
+        }
+
+        function showContact(id) {
+            const p = products.find(x => x.id === id);
+            const content = document.getElementById('contactContent');
+            
+            const commission = (p.price * 0.038).toFixed(2);
+            
+            content.innerHTML = `
+                <img src="${p.images[0]}" alt="${p.name}">
+                <h3 style="color: #D4AF37; font-size: 1.4rem; margin-bottom: 10px;">${p.name}</h3>
+                <p style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">${p.currency} $${p.price.toLocaleString()}</p>
+                <p style="color: #888; margin-bottom: 25px;">${p.condition} • ${p.location}</p>
+                
+                <div class="contact-details">
+                    <p><strong>Vendedor:</strong> ${p.seller}</p>
+                    <p><strong>Ubicacion:</strong> ${p.location}</p>
+                    <p><strong>Terminos de entrega:</strong><br>${p.terms}</p>
+                    <p><strong>Pago al vendedor:</strong><br>${p.sellerBank}</p>
+                </div>
+
+                <div class="terms-box">
+                    <h4>Sistema de Comision Automatica</h4>
+                    <p>Al realizar el pago:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                        <li><strong>96.2%</strong> → ${p.seller} (${p.currency} $${(p.price * 0.962).toFixed(2)})</li>
+                        <li><strong>3.8%</strong> → BBVA 012 180 01593646508 1 (${p.currency} $${commission})</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h4>Importante</h4>
+                    <p>Verifica la autenticidad antes de pagar. Acuerda el metodo de pago y envio directamente con el vendedor.</p>
+                </div>
+
+                <a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}?text=Hola%20${encodeURIComponent(p.seller)},%20vi%20tu%20mascara%20${encodeURIComponent(p.name)}%20en%20El%20Santuario%20de%20la%20Mascara%20por%20${p.currency}%20$${p.price}.%20Sigue%20disponible?" 
+                   class="whatsapp-btn" target="_blank">
+                    💬 Contactar por WhatsApp
+                </a>
+            `;
+            
+            openModal('contactModal');
+        }
+
+        function updateStats() {
+            const totalSales = products.reduce((sum, p) => {
+                const amount = p.currency === 'USD' ? p.price * 17 : p.currency === 'EUR' ? p.price * 18.5 : p.price;
+                return sum + amount;
+            }, 0);
+            
+            const totalComm = totalSales * 0.038;
+
+            document.getElementById('statTotal').textContent = '$' + Math.floor(totalSales).toLocaleString();
+            document.getElementById('statComm').textContent = '$' + Math.floor(totalComm).toLocaleString();
+            document.getElementById('statAuto').textContent = '$' + Math.floor(totalComm * 0.85).toLocaleString();
+            document.getElementById('statMasks').textContent = products.length;
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        window.onclick = (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
